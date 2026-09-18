@@ -17,7 +17,7 @@ class ClearCacheCommand extends Command
 
         $this->info(__('statamic-llms-txt::console.clear-cache.success'));
 
-        if (!config('statamic-llms-txt.cache.enabled')) {
+        if (! config('statamic-llms-txt.cache.enabled')) {
             $this->warn(__('statamic-llms-txt::console.clear-cache.disabled'));
         }
     }

@@ -72,17 +72,17 @@ it('uses remember with a ttl when caching is enabled and duration is set', funct
 it('bypasses cache when caching is disabled', function () {
     config()->set('statamic-llms-txt.cache.enabled', false);
 
-    $addonSettings = new class {
+    $addonSettings = new class
+    {
         public function get($key)
         {
             return [];
         }
     };
 
-    $addon = new class($addonSettings) {
-        public function __construct(private $settings)
-        {
-        }
+    $addon = new class($addonSettings)
+    {
+        public function __construct(private $settings) {}
 
         public function settings()
         {
