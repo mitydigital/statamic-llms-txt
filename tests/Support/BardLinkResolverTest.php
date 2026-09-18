@@ -7,7 +7,10 @@ use Statamic\Facades\Site;
 
 beforeEach(function () {
     config()->set('app.url', 'https://app.test');
-    config()->set('statamic-llms-txt.urls', []);
+    config()->set('statamic-llms-txt.convert_urls_to_entries', [
+        'enabled' => true,
+        'urls' => [],
+    ]);
 });
 
 it('converts APP_URL links without configured URLs', function () {
@@ -22,7 +25,7 @@ it('converts APP_URL links without configured URLs', function () {
 });
 
 it('converts configured URLs as well as APP_URL links', function () {
-    config()->set('statamic-llms-txt.urls', ['https://www.example.com']);
+    config()->set('statamic-llms-txt.convert_urls_to_entries.urls', ['https://www.example.com']);
 
     $site = mockSite();
     $appEntry = mockEntry('entry-app');
@@ -50,6 +53,14 @@ it('converts relative URLs and preserves query strings and fragments', function 
         ->toBe(bardContent('statamic://entry::entry-guides?topic=bard#links'));
 });
 
+it('does not rewrite links when conversion is disabled', function () {
+    config()->set('statamic-llms-txt.convert_urls_to_entries.enabled', false);
+
+    $content = bardContent('https://app.test/about');
+
+    expect(app(BardLinkResolver::class)->resolve($content))->toBe($content);
+});
+
 it('resolves links in nested Bard content', function () {
     $site = mockSite();
     $entry = mockEntry('entry-nested');
@@ -69,18 +80,25 @@ it('resolves links in nested Bard content', function () {
         ->toBe('statamic://entry::entry-nested');
 });
 
-it('leaves external, existing internal, non-page, and unresolvable links unchanged', function () {
-    $site = mockSite();
-
-    Site::shouldReceive('findByUrl')->once()->with('https://app.test/missing')->andReturn($site);
-    Entry::shouldReceive('findByUri')->once()->with('/missing', 'default')->andReturnNull();
-
+it('leaves external, existing internal, and non-page links unchanged', function () {
     $content = bardContent(
         'https://external.test/page',
         'statamic://entry::already-internal',
         'mailto:hello@example.com',
-        'https://app.test/missing',
     );
+
+    expect(app(BardLinkResolver::class)->resolve($content))->toBe($content);
+});
+
+it('leaves a watched URL unchanged when it cannot be resolved to an entry', function () {
+    config()->set('statamic-llms-txt.convert_urls_to_entries.urls', ['https://www.example.com']);
+
+    $site = mockSite();
+
+    Site::shouldReceive('findByUrl')->once()->with('https://www.example.com/missing')->andReturn($site);
+    Entry::shouldReceive('findByUri')->once()->with('/missing', 'default')->andReturnNull();
+
+    $content = bardContent('https://www.example.com/missing');
 
     expect(app(BardLinkResolver::class)->resolve($content))->toBe($content);
 });

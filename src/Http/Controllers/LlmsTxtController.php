@@ -29,7 +29,7 @@ class LlmsTxtController
         } else {
             $markdown = $this->getMarkdown();
         }
-        $markdown = $this->getMarkdown();
+
         return response($markdown, 200, [
             'Content-Type' => 'text/plain',
         ]);

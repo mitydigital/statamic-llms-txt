@@ -13,6 +13,10 @@ class BardLinkResolver
      */
     public function resolve(array $content): array
     {
+        if (! config('statamic-llms-txt.convert_urls_to_entries.enabled', true)) {
+            return $content;
+        }
+
         return array_map(fn (array $node): array => $this->resolveNode($node), $content);
     }
 
@@ -97,7 +101,7 @@ class BardLinkResolver
 
     protected function matchesAllowedBaseUrl(string $url): bool
     {
-        return collect([config('app.url'), ...config('statamic-llms-txt.urls', [])])
+        return collect([config('app.url'), ...config('statamic-llms-txt.convert_urls_to_entries.urls', [])])
             ->filter(fn (mixed $baseUrl): bool => is_string($baseUrl) && $baseUrl !== '')
             ->contains(fn (string $baseUrl): bool => $this->matchesBaseUrl($url, $baseUrl));
     }
