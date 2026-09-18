@@ -4,6 +4,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Convert URL-to-Entry URLs
+    |--------------------------------------------------------------------------
+    |
+    | If you are working locally, you may be authoring locally on a ".test"
+    | domain. Which means your URL-to-Entry conversion would only apply on any
+    | .test links.
+    |
+    | Enter any URLs you want to watch in the URL-to-Entry configuration here.
+    |
+    | It will automatically use your APP_URL.
+    |
+    */
+
+    'urls' => [
+        // 'https://www.my-domain.com'
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Content configuration
     |--------------------------------------------------------------------------
     |

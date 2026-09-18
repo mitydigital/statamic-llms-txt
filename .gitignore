@@ -10,6 +10,11 @@ composer.lock
 .php_cs.cache
 .phpunit.cache
 
+.codex
+.mcp.json
+boost.json
+AGENTS.md
+
 resources/dist/hot
 
 tests/__fixtures__/content/*.yaml
