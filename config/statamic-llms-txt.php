@@ -17,8 +17,12 @@ return [
     |
     */
 
-    'urls' => [
-        // 'https://www.my-domain.com'
+    'convert_urls_to_entries' => [
+        'urls' => [
+            // 'https://www.my-domain.com'
+        ],
+
+        'enabled' => true,
     ],
 
     /*
