@@ -141,6 +141,30 @@ it('renders normal links and resolves statamic entry links', function () {
         ->toBe('[External](https://example.com/external) and [Internal](https://example.com/resolved)');
 });
 
+it('resolves statamic entry links with query strings and fragments', function () {
+    $converter = app(BardToMarkdown::class);
+
+    $entry = mock(EntryContract::class);
+    $entry->shouldReceive('absoluteUrl')->once()->andReturn('https://example.com/guides');
+
+    Entry::shouldReceive('find')->once()->with('entry-guides')->andReturn($entry);
+
+    $nodes = [[
+        'type' => 'paragraph',
+        'content' => [[
+            'type' => 'text',
+            'text' => 'Guides',
+            'marks' => [[
+                'type' => 'link',
+                'attrs' => ['href' => 'statamic://entry::entry-guides?topic=bard#links'],
+            ]],
+        ]],
+    ]];
+
+    expect($converter->convert($nodes))
+        ->toBe('[Guides](https://example.com/guides?topic=bard#links)');
+});
+
 it('falls back to # when a statamic entry link cannot be resolved', function () {
     $converter = app(BardToMarkdown::class);
 

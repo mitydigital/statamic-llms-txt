@@ -82,10 +82,13 @@ class BardToMarkdown
     protected function resolveLink(string $href): string
     {
         if (str_starts_with($href, 'statamic://entry::')) {
-            $id = str_replace('statamic://entry::', '', $href);
+            $entryReference = str_replace('statamic://entry::', '', $href);
+            $queryOrFragmentPosition = strcspn($entryReference, '?#');
+            $id = substr($entryReference, 0, $queryOrFragmentPosition);
+            $queryOrFragment = substr($entryReference, $queryOrFragmentPosition);
             $entry = Entry::find($id);
 
-            return $entry?->absoluteUrl() ?? '#';
+            return $entry ? $entry->absoluteUrl().$queryOrFragment : '#';
         }
 
         return $href;
@@ -126,16 +129,6 @@ class BardToMarkdown
             ->implode('');
     }
 
-    protected function renderCodeBlock(array $node): string
-    {
-        $language = $node['attrs']['language'] ?? '';
-        $text = collect($node['content'] ?? [])
-            ->map(fn ($n) => $n['text'] ?? '')
-            ->implode('');
-
-        return "```{$language}\n{$text}\n```";
-    }
-
     protected function renderBlockquote(array $node): string
     {
         $content = collect($node['content'] ?? [])
@@ -148,5 +141,15 @@ class BardToMarkdown
         return collect($lines)
             ->map(fn ($line) => $line === '' ? '>' : '> '.$line)
             ->implode("\n");
+    }
+
+    protected function renderCodeBlock(array $node): string
+    {
+        $language = $node['attrs']['language'] ?? '';
+        $text = collect($node['content'] ?? [])
+            ->map(fn ($n) => $n['text'] ?? '')
+            ->implode('');
+
+        return "```{$language}\n{$text}\n```";
     }
 }
